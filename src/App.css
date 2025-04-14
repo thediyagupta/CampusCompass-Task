@@ -1,38 +1,45 @@
-.App {
-  text-align: center;
+import React,  useState  from 'react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import './App.css';
+import L from 'leaflet';
+import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
+import { GeocoderControl } from 'leaflet-control-geocoder';
+
+function App() {
+  const [location, setLocation] = useState([20.5937, 78.9629]); // Default center (India)
+
+  const handleSearch = (e) => {
+    const geocoder = new L.Control.Geocoder.Nominatim();
+    geocoder.geocode(e.target.value, function(results) {
+      if (results.length > 0) {
+        const { lat, lng } = results[0].center;
+        setLocation([lat, lng]); // Update the location state with new coordinates
+      }
+    });
+  };
+
+  return (
+    <div className="App">
+      <input
+        type="text"
+        placeholder="Search for a place"
+        onChange={handleSearch}
+        style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 1000 }}
+      />
+      <MapContainer center={location} zoom={5} style={{ height: "100vh", width: "100%" }}>
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+        />
+        <Marker position={location}>
+          <Popup>
+            You are here!
+          </Popup>
+        </Marker>
+      </MapContainer>
+    </div>
+  );
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
+export default App;
